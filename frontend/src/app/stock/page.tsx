@@ -18,6 +18,7 @@ export default function StockPage() {
   const [convertProfiles, setConvertProfiles] = useState<Record<number, string>>({});
   const [addMore, setAddMore] = useState<Record<number, string>>({});
   const [saving, setSaving] = useState(false);
+  const [migrating, setMigrating] = useState(false);
   const router = useRouter();
 
   const load = async () => {
@@ -99,7 +100,7 @@ export default function StockPage() {
 
   const handleAddProfiles = async (accountId: number) => {
     const count = parseInt(addMore[accountId] || '1');
-    if (isNaN(count) || count < 1) return alert('Número inválido');
+    if (isNaN(count) || count < 1) return alert('Numero invalido');
     try {
       await api.addProfiles(accountId, count);
       const next = { ...addMore };
@@ -111,6 +112,20 @@ export default function StockPage() {
     }
   };
 
+  const handleMigrate = async () => {
+    if (!confirm('Crear servicios de perfil y migrar cuentas convertidas?')) return;
+    setMigrating(true);
+    try {
+      const result: any = await api.migrateConverted();
+      alert(`Servicios creados: ${result.servicesCreated}\nCuentas migradas: ${result.migrated}`);
+      load();
+    } catch (err: any) {
+      alert(err.message);
+    } finally {
+      setMigrating(false);
+    }
+  };
+
   return (
     <>
       <Navbar />
@@ -119,10 +134,17 @@ export default function StockPage() {
           <h1 className="text-2xl font-bold">Stock</h1>
           <div className="flex gap-2">
             <button
+              onClick={handleMigrate}
+              disabled={migrating}
+              className="bg-amber-600 hover:bg-amber-700 disabled:opacity-50 rounded-lg px-4 py-2 text-sm transition"
+            >
+              {migrating ? 'Migrando...' : 'Migrar convertidas'}
+            </button>
+            <button
               onClick={() => setShowBulk(true)}
               className="bg-purple-600 hover:bg-purple-700 rounded-lg px-4 py-2 text-sm transition"
             >
-              + Importación masiva
+              + Importacion masiva
             </button>
             <button
               onClick={() => setShowCreate(true)}

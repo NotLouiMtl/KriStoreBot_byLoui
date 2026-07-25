@@ -319,7 +319,24 @@ export class AdminService {
   }
 
   async migrateConvertedAccounts() {
+    const profilePrices: Record<string, number> = {
+      'Disney': 10,
+      'Prime': 12,
+      'Crunchyroll': 15,
+      'Vix 1m': 3,
+      'Vix 6m': 5,
+      'Vix 12m': 10,
+    };
+
     return this.prisma.$transaction(async (tx) => {
+      for (const [name, price] of Object.entries(profilePrices)) {
+        const serviceName = `${name} Perfil`;
+        const exists = await tx.service.findFirst({ where: { name: serviceName } });
+        if (!exists) {
+          await tx.service.create({ data: { name: serviceName, price } });
+        }
+      }
+
       const profileAccounts = await tx.account.findMany({
         where: { type: 'profile' },
         include: { service: true },
@@ -333,8 +350,9 @@ export class AdminService {
         const targetName = `${account.service.name} Perfil`;
         let targetService = await tx.service.findFirst({ where: { name: targetName } });
         if (!targetService) {
+          const defaultPrice = profilePrices[account.service.name] ?? account.service.price;
           targetService = await tx.service.create({
-            data: { name: targetName, price: account.service.price },
+            data: { name: targetName, price: defaultPrice },
           });
         }
 
@@ -347,7 +365,8 @@ export class AdminService {
         }
       }
 
-      return { total: profileAccounts.length, migrated };
+      const services = await tx.service.findMany({ orderBy: { id: 'asc' } });
+      return { servicesCreated: Object.keys(profilePrices).length, migrated, services };
     });
   }
 }
