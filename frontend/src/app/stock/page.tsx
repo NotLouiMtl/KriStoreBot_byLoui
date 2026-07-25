@@ -223,6 +223,28 @@ export default function StockPage() {
                           </td>
                         </tr>
                       ))}
+                      {s.profileAccounts && s.profileAccounts.length > 0 && s.profileAccounts.map((a: any) => (
+                        <tr key={`p-${a.id}`} className="border-b border-gray-800/30 bg-blue-900/10">
+                          <td className="p-3 pl-8 text-xs text-blue-400" colSpan={2}>
+                            #{a.id} — {a.email} ({a.profileCount} perfiles)
+                          </td>
+                          <td className="p-3 text-xs text-blue-300" colSpan={2}>
+                            Perfiles: {a.profiles.map((p: any) =>
+                              `${p.profileNumber}${p.isOccupied ? '(vendido)' : '(libre)'}`
+                            ).join(', ')}
+                          </td>
+                          <td className="p-3">
+                            <button onClick={() => setEditAccount({ id: a.id, email: a.email, password: '', pin: '' })}
+                              className="bg-blue-700 hover:bg-blue-600 text-xs rounded px-2 py-1 transition mr-1">
+                              Editar
+                            </button>
+                            <button onClick={() => handleDeleteAccount(a.id)}
+                              className="bg-red-700 hover:bg-red-600 text-xs rounded px-2 py-1 transition">
+                              Borrar
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
                     </>
                   ))}
                 </tbody>

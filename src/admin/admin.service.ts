@@ -124,7 +124,8 @@ export class AdminService {
       if (account.type === 'profile') throw new Error('La cuenta ya esta en modo perfiles');
       if (account.isOccupied) throw new Error('No se puede convertir una cuenta vendida');
 
-      const profileServiceName = `${account.service.name} Perfil`;
+      const baseName = account.service.name.replace(/\s+Completa$/i, '');
+      const profileServiceName = `${baseName} Perfil`;
       let profileService = await tx.service.findFirst({ where: { name: profileServiceName } });
       if (!profileService) {
         profileService = await tx.service.create({
@@ -150,7 +151,7 @@ export class AdminService {
       include: {
         accounts: {
           include: {
-            profiles: { where: { isOccupied: false } },
+            profiles: true,
           },
         },
       },
@@ -158,9 +159,12 @@ export class AdminService {
 
     const summary = byService.map((s) => {
       const fullAccounts = s.accounts.filter(a => a.type === 'full' && !a.isOccupied);
-      const profileAvailable = s.accounts.reduce((sum, a) => {
-        if (a.type === 'profile') return sum + a.profiles.length;
-        return sum;
+      const profileAccounts = s.accounts.filter(a => a.type === 'profile');
+      const profileAvailable = profileAccounts.reduce((sum, a) => {
+        return sum + a.profiles.filter(p => !p.isOccupied).length;
+      }, 0);
+      const occupiedProfiles = profileAccounts.reduce((sum, a) => {
+        return sum + a.profiles.filter(p => p.isOccupied).length;
       }, 0);
       return {
         id: s.id,
@@ -168,7 +172,14 @@ export class AdminService {
         accounts: s.accounts.length,
         fullAvailable: fullAccounts.length,
         fullAccounts: fullAccounts.map(a => ({ id: a.id, email: a.email, pin: a.pin })),
+        profileAccounts: profileAccounts.map(a => ({
+          id: a.id,
+          email: a.email,
+          profiles: a.profiles,
+          profileCount: a.profiles.length,
+        })),
         profileAvailable,
+        occupiedProfiles,
         available: fullAccounts.length + profileAvailable,
       };
     });
@@ -347,10 +358,11 @@ export class AdminService {
         const alreadyCorrect = account.service.name.endsWith(' Perfil');
         if (alreadyCorrect) continue;
 
-        const targetName = `${account.service.name} Perfil`;
+        const baseName = account.service.name.replace(/\s+Completa$/i, '');
+        const targetName = `${baseName} Perfil`;
         let targetService = await tx.service.findFirst({ where: { name: targetName } });
         if (!targetService) {
-          const defaultPrice = profilePrices[account.service.name] ?? account.service.price;
+          const defaultPrice = profilePrices[baseName] ?? account.service.price;
           targetService = await tx.service.create({
             data: { name: targetName, price: defaultPrice },
           });
