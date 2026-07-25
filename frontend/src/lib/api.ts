@@ -70,4 +70,7 @@ export const api = {
     request('/admin/make-admin', { method: 'POST', body: JSON.stringify({ telegramId, password, username }) }),
   bulkImport: (data: { serviceId: number; emails: string[]; password: string; pin?: string }) =>
     request('/admin/stock/bulk-import', { method: 'POST', body: JSON.stringify(data) }),
+
+  migrateConverted: () =>
+    request('/admin/migrate-converted', { method: 'POST' }),
 };

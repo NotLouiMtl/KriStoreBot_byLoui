@@ -138,4 +138,9 @@ export class AdminController {
   async setPassword(@Body() body: { telegramId: string; password: string }, @Req() req: any) {
     return this.adminService.setPassword(body.telegramId, body.password, req.user.userId);
   }
+
+  @Post('migrate-converted')
+  async migrateConverted() {
+    return this.adminService.migrateConvertedAccounts();
+  }
 }

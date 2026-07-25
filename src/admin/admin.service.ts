@@ -119,10 +119,18 @@ export class AdminService {
 
   async convertAccount(accountId: number, numProfiles: number) {
     return this.prisma.$transaction(async (tx) => {
-      const account = await tx.account.findUnique({ where: { id: accountId } });
+      const account = await tx.account.findUnique({ where: { id: accountId }, include: { service: true } });
       if (!account) throw new NotFoundException('Cuenta no encontrada');
-      if (account.type === 'profile') throw new Error('La cuenta ya está en modo perfiles');
+      if (account.type === 'profile') throw new Error('La cuenta ya esta en modo perfiles');
       if (account.isOccupied) throw new Error('No se puede convertir una cuenta vendida');
+
+      const profileServiceName = `${account.service.name} Perfil`;
+      let profileService = await tx.service.findFirst({ where: { name: profileServiceName } });
+      if (!profileService) {
+        profileService = await tx.service.create({
+          data: { name: profileServiceName, price: account.service.price },
+        });
+      }
 
       const profileData = Array.from({ length: numProfiles }, (_, i) => ({
         accountId: account.id,
@@ -131,9 +139,9 @@ export class AdminService {
       await tx.profile.createMany({ data: profileData });
       await tx.account.update({
         where: { id: account.id },
-        data: { type: 'profile' },
+        data: { type: 'profile', serviceId: profileService.id },
       });
-      return { accountId: account.id, profilesCreated: numProfiles };
+      return { accountId: account.id, profilesCreated: numProfiles, profileServiceId: profileService.id };
     });
   }
 
@@ -307,6 +315,39 @@ export class AdminService {
       where: { telegramId: BigInt(telegramId) },
       data: { password: hashed },
       select: { id: true, telegramId: true, role: true },
+    });
+  }
+
+  async migrateConvertedAccounts() {
+    return this.prisma.$transaction(async (tx) => {
+      const profileAccounts = await tx.account.findMany({
+        where: { type: 'profile' },
+        include: { service: true },
+      });
+
+      let migrated = 0;
+      for (const account of profileAccounts) {
+        const alreadyCorrect = account.service.name.endsWith(' Perfil');
+        if (alreadyCorrect) continue;
+
+        const targetName = `${account.service.name} Perfil`;
+        let targetService = await tx.service.findFirst({ where: { name: targetName } });
+        if (!targetService) {
+          targetService = await tx.service.create({
+            data: { name: targetName, price: account.service.price },
+          });
+        }
+
+        if (account.serviceId !== targetService.id) {
+          await tx.account.update({
+            where: { id: account.id },
+            data: { serviceId: targetService.id },
+          });
+          migrated++;
+        }
+      }
+
+      return { total: profileAccounts.length, migrated };
     });
   }
 }
