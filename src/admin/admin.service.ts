@@ -213,7 +213,7 @@ export class AdminService {
     return this.prisma.service.create({ data: { name, price } });
   }
 
-  async updateService(id: number, data: { price?: number; active?: boolean }) {
+  async updateService(id: number, data: { name?: string; price?: number; active?: boolean }) {
     return this.prisma.service.update({ where: { id }, data });
   }
 

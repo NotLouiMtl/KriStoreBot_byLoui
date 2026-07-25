@@ -61,7 +61,7 @@ export class AdminController {
   @Put('services/:id')
   async updateService(
     @Param('id') id: string,
-    @Body() body: { price?: number; active?: boolean },
+    @Body() body: { name?: string; price?: number; active?: boolean },
   ) {
     return this.adminService.updateService(Number(id), body);
   }

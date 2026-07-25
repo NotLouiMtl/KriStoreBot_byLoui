@@ -58,7 +58,7 @@ export const api = {
   createService: (data: { name: string; price: number }) =>
     request('/admin/services', { method: 'POST', body: JSON.stringify(data) }),
 
-  updateService: (id: number, data: { price?: number; active?: boolean }) =>
+  updateService: (id: number, data: { name?: string; price?: number; active?: boolean }) =>
     request(`/admin/services/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
   deleteService: (id: number) =>
     request(`/admin/services/${id}`, { method: 'DELETE' }),

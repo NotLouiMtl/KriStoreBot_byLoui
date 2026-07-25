@@ -15,6 +15,7 @@ interface Service {
 export default function ServicesPage() {
   const [services, setServices] = useState<Service[]>([]);
   const [editingId, setEditingId] = useState<number | null>(null);
+  const [editName, setEditName] = useState('');
   const [editPrice, setEditPrice] = useState('');
   const [showCreate, setShowCreate] = useState(false);
   const [newName, setNewName] = useState('');
@@ -45,7 +46,7 @@ export default function ServicesPage() {
   };
 
   const handleDelete = async (id: number, name: string) => {
-    if (!confirm(`¿Borrar "${name}" y todas sus cuentas/perfiles?`)) return;
+    if (!confirm(`Borrar "${name}" y todas sus cuentas/perfiles?`)) return;
     try {
       await api.deleteService(id);
       load();
@@ -54,9 +55,9 @@ export default function ServicesPage() {
     }
   };
 
-  const handleSavePrice = async (id: number) => {
+  const handleSave = async (id: number) => {
     try {
-      await api.updateService(id, { price: Number(editPrice) });
+      await api.updateService(id, { name: editName, price: Number(editPrice) });
       setEditingId(null);
       load();
     } catch (err: any) {
@@ -107,22 +108,29 @@ export default function ServicesPage() {
               {services.map((s) => (
                 <tr key={s.id} className="border-b border-gray-800/50 hover:bg-gray-800/30">
                   <td className="p-4">{s.id}</td>
-                  <td className="p-4">{s.name}</td>
                   <td className="p-4">
                     {editingId === s.id ? (
-                      <div className="flex gap-2 items-center">
-                        <input
-                          type="number"
-                          value={editPrice}
-                          onChange={(e) => setEditPrice(e.target.value)}
-                          className="bg-gray-800 border border-gray-700 rounded px-2 py-1 w-24"
-                          step="0.01"
-                        />
-                        <button onClick={() => handleSavePrice(s.id)} className="text-green-400 hover:text-green-300 text-xs">Guardar</button>
-                        <button onClick={() => setEditingId(null)} className="text-gray-400 hover:text-gray-300 text-xs">Cancelar</button>
-                      </div>
+                      <input
+                        type="text"
+                        value={editName}
+                        onChange={(e) => setEditName(e.target.value)}
+                        className="bg-gray-800 border border-gray-700 rounded px-2 py-1 w-48"
+                      />
                     ) : (
-                      <span>${s.price}</span>
+                      s.name
+                    )}
+                  </td>
+                  <td className="p-4">
+                    {editingId === s.id ? (
+                      <input
+                        type="number"
+                        value={editPrice}
+                        onChange={(e) => setEditPrice(e.target.value)}
+                        className="bg-gray-800 border border-gray-700 rounded px-2 py-1 w-24"
+                        step="0.01"
+                      />
+                    ) : (
+                      `$${s.price}`
                     )}
                   </td>
                   <td className="p-4">
@@ -131,24 +139,37 @@ export default function ServicesPage() {
                     </span>
                   </td>
                   <td className="p-4 text-right">
-                    <button
-                      onClick={() => { setEditingId(s.id); setEditPrice(s.price.toString()); }}
-                      className="bg-gray-700 hover:bg-gray-600 text-xs px-3 py-1.5 rounded mr-2 transition"
-                    >
-                      Editar precio
-                    </button>
-                    <button
-                      onClick={() => handleToggleActive(s.id, s.active)}
-                      className={`text-xs px-3 py-1.5 rounded transition ${s.active ? 'bg-red-600 hover:bg-red-700' : 'bg-green-600 hover:bg-green-700'}`}
-                    >
-                      {s.active ? 'Desactivar' : 'Activar'}
-                    </button>
-                    <button
-                      onClick={() => handleDelete(s.id, s.name)}
-                      className="text-xs px-3 py-1.5 rounded bg-gray-800 hover:bg-red-900/50 text-red-400 transition ml-1"
-                    >
-                      🗑
-                    </button>
+                    {editingId === s.id ? (
+                      <>
+                        <button onClick={() => handleSave(s.id)} className="text-green-400 hover:text-green-300 text-xs px-3 py-1.5 rounded bg-green-900/30 mr-2 transition">
+                          Guardar
+                        </button>
+                        <button onClick={() => setEditingId(null)} className="text-gray-400 hover:text-gray-300 text-xs px-3 py-1.5 rounded bg-gray-800 transition">
+                          Cancelar
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        <button
+                          onClick={() => { setEditingId(s.id); setEditName(s.name); setEditPrice(s.price.toString()); }}
+                          className="bg-gray-700 hover:bg-gray-600 text-xs px-3 py-1.5 rounded mr-2 transition"
+                        >
+                          Editar
+                        </button>
+                        <button
+                          onClick={() => handleToggleActive(s.id, s.active)}
+                          className={`text-xs px-3 py-1.5 rounded transition ${s.active ? 'bg-red-600 hover:bg-red-700' : 'bg-green-600 hover:bg-green-700'}`}
+                        >
+                          {s.active ? 'Desactivar' : 'Activar'}
+                        </button>
+                        <button
+                          onClick={() => handleDelete(s.id, s.name)}
+                          className="text-xs px-3 py-1.5 rounded bg-gray-800 hover:bg-red-900/50 text-red-400 transition ml-1"
+                        >
+                          Borrar
+                        </button>
+                      </>
+                    )}
                   </td>
                 </tr>
               ))}
