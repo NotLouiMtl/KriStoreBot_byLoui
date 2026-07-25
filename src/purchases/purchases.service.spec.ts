@@ -16,6 +16,11 @@ describe('PurchasesService', () => {
       service: {
         findUnique: jest.fn(),
       },
+      account: {
+        findFirst: jest.fn().mockResolvedValue(null),
+        update: jest.fn(),
+        count: jest.fn().mockResolvedValue(10),
+      },
       profile: {
         findFirst: jest.fn(),
         update: jest.fn(),
@@ -32,6 +37,9 @@ describe('PurchasesService', () => {
       $transaction: jest.fn((cb: (tx: any) => any) => cb(mockTx)),
       purchase: {
         findMany: jest.fn(),
+      },
+      account: {
+        count: jest.fn().mockResolvedValue(10),
       },
       profile: {
         count: jest.fn().mockResolvedValue(10),
@@ -64,7 +72,7 @@ describe('PurchasesService', () => {
 
       const result = await service.comprar(1, 1);
 
-      expect(result).toEqual(profile);
+      expect(result).toEqual({ type: 'profile', profile, serviceName: 'Netflix' });
       expect(mockTx.profile.update).toHaveBeenCalledWith({
         where: { id: 1 },
         data: expect.objectContaining({ isOccupied: true, assignedToId: 1 }),

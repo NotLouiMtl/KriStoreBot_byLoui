@@ -37,21 +37,21 @@ describe('Bot Handlers', () => {
 
   describe('registerSaldoHandler', () => {
     it('registra comando saldo', () => {
-      registerSaldoHandler(mockBot);
+      registerSaldoHandler(mockBot, {} as any);
       expect(mockBot.command).toHaveBeenCalledWith('saldo', expect.any(Function));
     });
   });
 
   describe('registerServiciosHandler', () => {
     it('registra comando servicios', () => {
-      registerServiciosHandler(mockBot);
+      registerServiciosHandler(mockBot, {} as any);
       expect(mockBot.command).toHaveBeenCalledWith('servicios', expect.any(Function));
     });
   });
 
   describe('registerComprarHandler', () => {
     it('registra comando comprar', () => {
-      registerComprarHandler(mockBot);
+      registerComprarHandler(mockBot, {} as any, {} as any);
       expect(mockBot.command).toHaveBeenCalledWith('comprar', expect.any(Function));
     });
   });

@@ -12,21 +12,32 @@ export function registerServiciosHandler(bot: Telegraf, prisma: PrismaService) {
       },
     });
 
-    const available = services
-      .map((s) => ({
-        ...s,
-        stock: s.accounts.reduce((sum, a) => {
-          if (a.type === 'full' && !a.isOccupied) return sum + 1;
-          return sum + a.profiles.length;
-        }, 0),
-      }))
-      .filter((s) => s.stock > 0);
+    const entries: { text: string; callback_data: string }[] = [];
 
-    if (available.length === 0) return ctx.reply('No hay servicios disponibles.');
+    for (const s of services) {
+      const fullCount = s.accounts.filter(a => a.type === 'full' && !a.isOccupied).length;
+      const profileCount = s.accounts.reduce((sum, a) => {
+        if (a.type === 'profile') return sum + a.profiles.length;
+        return sum;
+      }, 0);
 
-    const keyboard = available.map((s) => [
-      { text: `${s.name} - $${s.price} (${s.stock} disp.)`, callback_data: `buy_${s.id}` },
-    ]);
+      if (fullCount > 0) {
+        entries.push({
+          text: `${s.name} (Cuenta completa) - $${s.price} (${fullCount} disp.)`,
+          callback_data: `buy_${s.id}_full`,
+        });
+      }
+      if (profileCount > 0) {
+        entries.push({
+          text: `${s.name} (Perfil) - $${s.price} (${profileCount} disp.)`,
+          callback_data: `buy_${s.id}_profile`,
+        });
+      }
+    }
+
+    if (entries.length === 0) return ctx.reply('No hay servicios disponibles.');
+
+    const keyboard = entries.map((e) => [{ text: e.text, callback_data: e.callback_data }]);
 
     ctx.reply('Selecciona un servicio:', {
       reply_markup: { inline_keyboard: keyboard },

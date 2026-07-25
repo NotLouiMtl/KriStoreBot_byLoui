@@ -7,7 +7,7 @@ export class PurchasesService {
 
   constructor(private readonly prisma: PrismaService) {}
 
-  async comprar(userId: number, serviceId: number) {
+  async comprar(userId: number, serviceId: number, preferredType?: 'full' | 'profile') {
     return this.prisma.$transaction(async (tx) => {
       const user = await tx.user.findUnique({ where: { id: userId } });
       const service = await tx.service.findUnique({ where: { id: serviceId } });
@@ -18,49 +18,49 @@ export class PurchasesService {
         throw new Error(`Saldo insuficiente. Necesitas $${service.price}, tienes $${user.saldo}`);
       }
 
-      // Try full account first
-      const fullAccount = await tx.account.findFirst({
-        where: { serviceId, type: 'full', isOccupied: false, status: 'active' },
-      });
-
-      if (fullAccount) {
-        await tx.account.update({
-          where: { id: fullAccount.id },
-          data: { isOccupied: true, assignedToId: userId, assignedAt: new Date() },
-        });
-
-        await tx.user.update({
-          where: { id: userId },
-          data: { saldo: { decrement: service.price } },
-        });
-
-        const expiresAt = new Date();
-        expiresAt.setDate(expiresAt.getDate() + 30);
-
-        await tx.purchase.create({
-          data: { userId, serviceId, accountId: fullAccount.id, price: service.price, expiresAt },
-        });
-
-        await tx.transaction.create({
-          data: {
-            userId,
-            type: 'purchase',
-            amount: service.price,
-            description: `Compra: ${service.name} - Cuenta completa`,
-          },
-        });
-
-        const remaining = await this.prisma.account.count({
+      if (preferredType !== 'profile') {
+        const fullAccount = await tx.account.findFirst({
           where: { serviceId, type: 'full', isOccupied: false, status: 'active' },
         });
-        if (remaining <= 3) {
-          this.logger.warn(`Stock bajo (cuentas completas) para "${service.name}": ${remaining} disponible(s)`);
-        }
 
-        return { type: 'full', account: fullAccount };
+        if (fullAccount) {
+          await tx.account.update({
+            where: { id: fullAccount.id },
+            data: { isOccupied: true, assignedToId: userId, assignedAt: new Date() },
+          });
+
+          await tx.user.update({
+            where: { id: userId },
+            data: { saldo: { decrement: service.price } },
+          });
+
+          const expiresAt = new Date();
+          expiresAt.setDate(expiresAt.getDate() + 30);
+
+          await tx.purchase.create({
+            data: { userId, serviceId, accountId: fullAccount.id, price: service.price, expiresAt },
+          });
+
+          await tx.transaction.create({
+            data: {
+              userId,
+              type: 'purchase',
+              amount: service.price,
+              description: `Compra: ${service.name} - Cuenta completa`,
+            },
+          });
+
+          const remaining = await this.prisma.account.count({
+            where: { serviceId, type: 'full', isOccupied: false, status: 'active' },
+          });
+          if (remaining <= 3) {
+            this.logger.warn(`Stock bajo (cuentas completas) para "${service.name}": ${remaining} disponible(s)`);
+          }
+
+          return { type: 'full', account: fullAccount, serviceName: service.name };
+        }
       }
 
-      // Fall back to profile
       const profile = await tx.profile.findFirst({
         where: {
           isOccupied: false,
@@ -104,7 +104,7 @@ export class PurchasesService {
         this.logger.warn(`Stock bajo para "${service.name}": ${remaining} perfil(es) disponible(s)`);
       }
 
-      return { type: 'profile', profile };
+      return { type: 'profile', profile, serviceName: service.name };
     });
   }
 

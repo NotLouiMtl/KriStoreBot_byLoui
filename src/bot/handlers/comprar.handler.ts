@@ -21,7 +21,7 @@ export function registerComprarHandler(bot: Telegraf, usersService: UsersService
         const a = result.account;
         const pinText = a.pin ? `\nPIN: ${a.pin}` : '';
         ctx.reply(
-          `Compra exitosa!\n\nCuenta: ${a.email}\nPassword: ${a.password}${pinText}\n\nEsta cuenta expira en 30 días.`
+          `Compra exitosa!\n\nServicio: ${result.serviceName} (Cuenta completa)\nCuenta: ${a.email}\nPassword: ${a.password}${pinText}\n\nEsta cuenta expira en 30 dias.`
         );
       } else if (result.profile) {
         const profile = result.profile;
@@ -31,7 +31,7 @@ export function registerComprarHandler(bot: Telegraf, usersService: UsersService
             ? `\nPIN: ${profile.account.pin}`
             : '';
         ctx.reply(
-          `Compra exitosa!\n\nCuenta: ${profile.account.email}\nPassword: ${profile.account.password}${pinText}\nPerfil: #${profile.profileNumber}\n\nEste perfil expira en 30 días.`
+          `Compra exitosa!\n\nServicio: ${result.serviceName} (Perfil)\nCuenta: ${profile.account.email}\nPassword: ${profile.account.password}${pinText}\nPerfil: #${profile.profileNumber}\n\nEste perfil expira en 30 dias.`
         );
       }
     } catch (error: any) {
