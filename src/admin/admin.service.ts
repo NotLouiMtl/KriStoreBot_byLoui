@@ -378,6 +378,12 @@ export class AdminService {
     });
   }
 
+  async initialSetup(telegramId: string, password: string, username?: string) {
+    const adminCount = await this.prisma.user.count({ where: { role: 'ADMIN' } });
+    if (adminCount > 0) throw new ForbiddenException('Ya existe un administrador');
+    return this.makeAdmin(telegramId, password, username);
+  }
+
   async deleteUser(id: number) {
     return this.prisma.$transaction(async (tx) => {
       const user = await tx.user.findUnique({ where: { id } });
