@@ -36,8 +36,9 @@ export class BotService implements OnModuleInit {
       this.prisma,
     );
 
+    const webhookUrl = process.env.WEBHOOK_URL || 'https://kristorebot-byloui.onrender.com/bot';
     this.bot.telegram
-      .setWebhook('https://botloui.onrender.com/bot')
+      .setWebhook(webhookUrl)
       .catch((err) => {
         this.logger.warn(
           `Webhook registration failed (non-fatal): ${err.message}`,
