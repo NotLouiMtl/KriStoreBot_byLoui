@@ -29,11 +29,20 @@ export class BotService implements OnModuleInit {
     registerSaldoHandler(this.bot, this.usersService);
     registerServiciosHandler(this.bot, this.prisma);
     registerComprarHandler(this.bot, this.usersService, this.purchasesService);
-    registerCallbackHandler(this.bot, this.usersService, this.purchasesService, this.prisma);
+    registerCallbackHandler(
+      this.bot,
+      this.usersService,
+      this.purchasesService,
+      this.prisma,
+    );
 
-    this.bot.telegram.setWebhook('https://botloui.onrender.com/bot').catch((err) => {
-      this.logger.warn(`Webhook registration failed (non-fatal): ${err.message}`);
-    });
+    this.bot.telegram
+      .setWebhook('https://botloui.onrender.com/bot')
+      .catch((err) => {
+        this.logger.warn(
+          `Webhook registration failed (non-fatal): ${err.message}`,
+        );
+      });
     this.logger.log('Bot webhook configurado');
   }
 

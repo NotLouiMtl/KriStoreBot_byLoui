@@ -41,4 +41,63 @@ export class ExpirationService {
       this.logger.log(`Liberados ${expirados.length} items expirados`);
     }
   }
+
+  @Cron(CronExpression.EVERY_DAY_AT_NOON)
+  async decrementarDiasRestantes() {
+    const cuentasActivas = await this.prisma.account.findMany({
+      where: { status: 'active', daysRemaining: { gt: 0 } },
+      include: { profiles: true },
+    });
+
+    let liberadas = 0;
+
+    for (const cuenta of cuentasActivas) {
+      const nuevoDias = cuenta.daysRemaining - 1;
+
+      if (nuevoDias <= 0) {
+        await this.prisma.$transaction(async (tx) => {
+          await tx.account.update({
+            where: { id: cuenta.id },
+            data: {
+              daysRemaining: 0,
+              isOccupied: false,
+              assignedToId: null,
+              assignedAt: null,
+              status: 'dead',
+            },
+          });
+
+          await tx.profile.updateMany({
+            where: { accountId: cuenta.id, isOccupied: true },
+            data: { isOccupied: false, assignedToId: null, assignedAt: null },
+          });
+
+          await tx.purchase.updateMany({
+            where: { accountId: cuenta.id, status: 'completed' },
+            data: { status: 'expired' },
+          });
+
+          const profileIds = cuenta.profiles.map((p) => p.id);
+          if (profileIds.length > 0) {
+            await tx.purchase.updateMany({
+              where: { profileId: { in: profileIds }, status: 'completed' },
+              data: { status: 'expired' },
+            });
+          }
+        });
+        liberadas++;
+      } else {
+        await this.prisma.account.update({
+          where: { id: cuenta.id },
+          data: { daysRemaining: nuevoDias },
+        });
+      }
+    }
+
+    if (cuentasActivas.length > 0) {
+      this.logger.log(
+        `Dias decrementados: ${cuentasActivas.length} cuentas procesadas, ${liberadas} cuentas agotadas`,
+      );
+    }
+  }
 }

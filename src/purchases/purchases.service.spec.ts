@@ -72,7 +72,11 @@ describe('PurchasesService', () => {
 
       const result = await service.comprar(1, 1);
 
-      expect(result).toEqual({ type: 'profile', profile, serviceName: 'Netflix' });
+      expect(result).toEqual({
+        type: 'profile',
+        profile,
+        serviceName: 'Netflix',
+      });
       expect(mockTx.profile.update).toHaveBeenCalledWith({
         where: { id: 1 },
         data: expect.objectContaining({ isOccupied: true, assignedToId: 1 }),
@@ -85,7 +89,11 @@ describe('PurchasesService', () => {
         data: expect.objectContaining({ userId: 1, serviceId: 1, price: 25 }),
       });
       expect(mockTx.transaction.create).toHaveBeenCalledWith({
-        data: expect.objectContaining({ userId: 1, type: 'purchase', amount: 25 }),
+        data: expect.objectContaining({
+          userId: 1,
+          type: 'purchase',
+          amount: 25,
+        }),
       });
     });
 
@@ -121,7 +129,9 @@ describe('PurchasesService', () => {
       mockTx.service.findUnique.mockResolvedValue(serviceData);
       mockTx.profile.findFirst.mockResolvedValue(null);
 
-      await expect(service.comprar(1, 1)).rejects.toThrow('Sin stock disponible');
+      await expect(service.comprar(1, 1)).rejects.toThrow(
+        'Sin stock disponible',
+      );
     });
   });
 });

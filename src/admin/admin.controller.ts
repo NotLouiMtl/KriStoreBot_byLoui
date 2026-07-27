@@ -1,4 +1,14 @@
-import { Controller, Get, Post, Put, Delete, Param, Body, UseGuards, Req } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Delete,
+  Param,
+  Body,
+  UseGuards,
+  Req,
+} from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { AdminService } from './admin.service';
@@ -30,12 +40,25 @@ export class AdminController {
 
   @Post('create-account')
   async createAccount(@Body() body: CreateStockDto) {
-    return this.adminService.createStock(body.serviceId, body.email, body.password, body.pin, body.profiles, body.profilePins, body.type);
+    return this.adminService.createStock(
+      body.serviceId,
+      body.email,
+      body.password,
+      body.pin,
+      body.profiles,
+      body.profilePins,
+      body.type,
+    );
   }
 
   @Post('stock/bulk-import')
   async bulkImport(@Body() body: BulkImportDto) {
-    return this.adminService.bulkImport(body.serviceId, body.emails, body.password, body.pin);
+    return this.adminService.bulkImport(
+      body.serviceId,
+      body.emails,
+      body.password,
+      body.pin,
+    );
   }
 
   @Get('stock')
@@ -87,8 +110,14 @@ export class AdminController {
   }
 
   @Post('make-admin')
-  async makeAdmin(@Body() body: { telegramId: string; password: string; username?: string }) {
-    return this.adminService.makeAdmin(body.telegramId, body.password, body.username);
+  async makeAdmin(
+    @Body() body: { telegramId: string; password: string; username?: string },
+  ) {
+    return this.adminService.makeAdmin(
+      body.telegramId,
+      body.password,
+      body.username,
+    );
   }
 
   @Get('stock/accounts')
@@ -125,7 +154,10 @@ export class AdminController {
   }
 
   @Post('convert-account/:id')
-  async convertAccount(@Param('id') id: string, @Body() body: { profiles: number }) {
+  async convertAccount(
+    @Param('id') id: string,
+    @Body() body: { profiles: number },
+  ) {
     return this.adminService.convertAccount(Number(id), body.profiles || 5);
   }
 
@@ -135,8 +167,15 @@ export class AdminController {
   }
 
   @Post('set-password')
-  async setPassword(@Body() body: { telegramId: string; password: string }, @Req() req: any) {
-    return this.adminService.setPassword(body.telegramId, body.password, req.user.userId);
+  async setPassword(
+    @Body() body: { telegramId: string; password: string },
+    @Req() req: any,
+  ) {
+    return this.adminService.setPassword(
+      body.telegramId,
+      body.password,
+      req.user.userId,
+    );
   }
 
   @Post('migrate-converted')

@@ -32,13 +32,13 @@ export default function DashboardPage() {
     }
   };
 
-  if (!stats) return <div className="p-8 text-gray-500">Cargando...</div>;
+  if (!stats) return <div className="p-8 text-gray-400">Cargando...</div>;
 
   const cards = [
-    { label: 'Usuarios totales', value: stats.totalUsers, color: 'blue' },
-    { label: 'Saldo total del sistema', value: `$${stats.totalSaldo}`, color: 'green' },
-    { label: 'Stock disponible', value: stats.stockAvailable, color: 'yellow' },
-    { label: 'Ventas del día', value: stats.todaySales, color: 'purple' },
+    { label: 'Usuarios totales', value: stats.totalUsers, color: 'text-sky-500' },
+    { label: 'Saldo total del sistema', value: `$${stats.totalSaldo}`, color: 'text-pink-500' },
+    { label: 'Stock disponible', value: stats.stockAvailable, color: 'text-sky-400' },
+    { label: 'Ventas del dia', value: stats.todaySales, color: 'text-rose-400' },
   ];
 
   return (
@@ -46,22 +46,22 @@ export default function DashboardPage() {
       <Navbar />
       <main className="p-6 max-w-5xl mx-auto">
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold">Dashboard</h1>
+          <h1 className="text-2xl font-bold text-gray-800">Dashboard</h1>
           {user && (
-            <div className="text-sm text-gray-400 flex items-center gap-2">
+            <div className="text-sm text-gray-500 flex items-center gap-2">
               {showUsername ? (
                 <div className="flex gap-2 items-center">
                   <input value={editUsername} onChange={(e) => setEditUsername(e.target.value)}
-                    className="bg-gray-800 border border-gray-700 rounded px-2 py-1 text-sm w-40"
+                    className="bg-pink-50 border border-pink-200 rounded px-2 py-1 text-sm w-40 focus:outline-none focus:border-pink-400"
                     placeholder="Nuevo username" />
-                  <button onClick={handleSetUsername} className="text-green-400 hover:text-green-300 text-xs">Guardar</button>
-                  <button onClick={() => setShowUsername(false)} className="text-gray-400 hover:text-gray-300 text-xs">Cancelar</button>
+                  <button onClick={handleSetUsername} className="text-pink-500 hover:text-pink-600 text-xs">Guardar</button>
+                  <button onClick={() => setShowUsername(false)} className="text-gray-400 hover:text-gray-500 text-xs">Cancelar</button>
                 </div>
               ) : (
                 <>
                   <span>{user.username || 'sin username'}</span>
                   <button onClick={() => { setEditUsername(user.username || ''); setShowUsername(true); }}
-                    className="text-blue-400 hover:text-blue-300 text-xs">✏️</button>
+                    className="text-sky-400 hover:text-sky-500 text-xs">Editar</button>
                 </>
               )}
             </div>
@@ -69,9 +69,9 @@ export default function DashboardPage() {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {cards.map((card) => (
-            <div key={card.label} className={`bg-gray-900 border border-gray-800 rounded-xl p-5`}>
-              <p className="text-sm text-gray-400 mb-1">{card.label}</p>
-              <p className={`text-2xl font-bold text-${card.color}-400`}>{card.value}</p>
+            <div key={card.label} className="bg-white border border-pink-200 rounded-xl p-5 shadow-sm">
+              <p className="text-sm text-gray-500 mb-1">{card.label}</p>
+              <p className={`text-2xl font-bold ${card.color}`}>{card.value}</p>
             </div>
           ))}
         </div>

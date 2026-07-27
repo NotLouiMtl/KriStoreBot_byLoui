@@ -15,8 +15,14 @@ async function bootstrap() {
 
   app.enableCors({
     origin: (origin, callback) => {
-      const allowed = process.env.CORS_ORIGIN?.split(',') || ['http://localhost:3001'];
-      if (!origin || allowed.some((a) => origin.includes(a)) || origin.endsWith('.vercel.app')) {
+      const allowed = process.env.CORS_ORIGIN?.split(',') || [
+        'http://localhost:3001',
+      ];
+      if (
+        !origin ||
+        allowed.some((a) => origin.includes(a)) ||
+        origin.endsWith('.vercel.app')
+      ) {
         callback(null, true);
       } else {
         callback(null, false);

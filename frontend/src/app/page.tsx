@@ -22,7 +22,7 @@ export default function LoginPage() {
       localStorage.setItem('user', JSON.stringify(data.user));
       router.push('/dashboard');
     } catch (err: any) {
-      setError(err.message || 'Error al iniciar sesión');
+      setError(err.message || 'Error al iniciar sesion');
     } finally {
       setLoading(false);
     }
@@ -30,27 +30,27 @@ export default function LoginPage() {
 
   return (
     <div className="flex items-center justify-center min-h-screen">
-      <form onSubmit={handleLogin} className="bg-gray-900 p-8 rounded-xl w-96 border border-gray-800">
-        <h1 className="text-2xl font-bold mb-6 text-center">Panel Admin</h1>
+      <form onSubmit={handleLogin} className="bg-white p-8 rounded-xl w-96 border border-pink-200 shadow-lg shadow-pink-100">
+        <h1 className="text-2xl font-bold mb-6 text-center text-pink-500">Panel Admin</h1>
 
-        {error && <div className="bg-red-900/50 text-red-400 p-3 rounded-lg mb-4 text-sm">{error}</div>}
+        {error && <div className="bg-rose-50 text-rose-500 p-3 rounded-lg mb-4 text-sm border border-rose-200">{error}</div>}
 
-        <label className="block text-sm text-gray-400 mb-2">Telegram ID o Usuario</label>
+        <label className="block text-sm text-gray-500 mb-2">Telegram ID o Usuario</label>
         <input
           type="text"
           value={telegramId}
           onChange={(e) => setTelegramId(e.target.value)}
-          className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 mb-3 focus:outline-none focus:border-blue-500"
+          className="w-full bg-pink-50 border border-pink-200 rounded-lg px-4 py-3 mb-3 focus:outline-none focus:border-pink-400"
           placeholder="123456789 o username"
           required
         />
 
-        <label className="block text-sm text-gray-400 mb-2">Contraseña</label>
+        <label className="block text-sm text-gray-500 mb-2">Contrasena</label>
         <input
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 mb-4 focus:outline-none focus:border-blue-500"
+          className="w-full bg-pink-50 border border-pink-200 rounded-lg px-4 py-3 mb-4 focus:outline-none focus:border-pink-400"
           placeholder="••••••••"
           required
         />
@@ -58,7 +58,7 @@ export default function LoginPage() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-50 rounded-lg py-3 font-semibold transition"
+          className="w-full bg-sky-400 hover:bg-sky-500 disabled:opacity-50 rounded-lg py-3 font-semibold transition text-white"
         >
           {loading ? 'Entrando...' : 'Ingresar'}
         </button>

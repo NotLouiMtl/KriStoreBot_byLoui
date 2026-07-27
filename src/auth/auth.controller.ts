@@ -12,6 +12,11 @@ export class AuthController {
   @Post('login')
   async login(@Body() dto: LoginDto, @Req() req: Request) {
     const ip = req.ip || req.socket?.remoteAddress;
-    return this.authService.login(dto.telegramId || dto.username!, dto.password, ip, req.headers['user-agent']);
+    return this.authService.login(
+      dto.telegramId || dto.username!,
+      dto.password,
+      ip,
+      req.headers['user-agent'],
+    );
   }
 }

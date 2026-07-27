@@ -1,4 +1,10 @@
-import { IsString, IsNumber, IsOptional, IsArray, ArrayMinSize } from 'class-validator';
+import {
+  IsString,
+  IsNumber,
+  IsOptional,
+  IsArray,
+  ArrayMinSize,
+} from 'class-validator';
 
 export class BulkImportDto {
   @IsNumber()

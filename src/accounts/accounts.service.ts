@@ -13,6 +13,9 @@ export class AccountsService {
   }
 
   async findById(id: number) {
-    return this.prisma.account.findUnique({ where: { id }, include: { profiles: true } });
+    return this.prisma.account.findUnique({
+      where: { id },
+      include: { profiles: true },
+    });
   }
 }

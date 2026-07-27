@@ -31,28 +31,40 @@ describe('Bot Handlers', () => {
       const handler = mockBot.start.mock.calls[0][0];
       await handler(ctx);
 
-      expect(ctx.reply).toHaveBeenCalledWith(expect.stringContaining('Bienvenido'), expect.objectContaining({ reply_markup: expect.anything() }));
+      expect(ctx.reply).toHaveBeenCalledWith(
+        expect.stringContaining('Bienvenido'),
+        expect.objectContaining({ reply_markup: expect.anything() }),
+      );
     });
   });
 
   describe('registerSaldoHandler', () => {
     it('registra comando saldo', () => {
       registerSaldoHandler(mockBot, {} as any);
-      expect(mockBot.command).toHaveBeenCalledWith('saldo', expect.any(Function));
+      expect(mockBot.command).toHaveBeenCalledWith(
+        'saldo',
+        expect.any(Function),
+      );
     });
   });
 
   describe('registerServiciosHandler', () => {
     it('registra comando servicios', () => {
       registerServiciosHandler(mockBot, {} as any);
-      expect(mockBot.command).toHaveBeenCalledWith('servicios', expect.any(Function));
+      expect(mockBot.command).toHaveBeenCalledWith(
+        'servicios',
+        expect.any(Function),
+      );
     });
   });
 
   describe('registerComprarHandler', () => {
     it('registra comando comprar', () => {
       registerComprarHandler(mockBot, {} as any, {} as any);
-      expect(mockBot.command).toHaveBeenCalledWith('comprar', expect.any(Function));
+      expect(mockBot.command).toHaveBeenCalledWith(
+        'comprar',
+        expect.any(Function),
+      );
     });
   });
 });

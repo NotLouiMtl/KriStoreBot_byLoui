@@ -7,7 +7,10 @@ export function registerServiciosHandler(bot: Telegraf, prisma: PrismaService) {
       where: { active: true },
       include: {
         accounts: {
-          include: { profiles: { where: { isOccupied: false }, select: { id: true } } },
+          where: { status: 'active' },
+          include: {
+            profiles: { where: { isOccupied: false }, select: { id: true } },
+          },
         },
       },
     });
@@ -15,21 +18,32 @@ export function registerServiciosHandler(bot: Telegraf, prisma: PrismaService) {
     const entries: { text: string; callback_data: string }[] = [];
 
     for (const s of services) {
-      const fullCount = s.accounts.filter(a => a.type === 'full' && !a.isOccupied).length;
-      const profileCount = s.accounts.reduce((sum, a) => {
-        if (a.type === 'profile') return sum + a.profiles.length;
-        return sum;
-      }, 0);
+      const fullAccounts = s.accounts.filter(
+        (a) => a.type === 'full' && !a.isOccupied,
+      );
+      const fullCount = fullAccounts.length;
+      const minDaysFull =
+        fullAccounts.length > 0
+          ? Math.min(...fullAccounts.map((a) => a.daysRemaining))
+          : 0;
+
+      const profileAccounts = s.accounts.filter((a) => a.type === 'profile');
+      const freeProfiles = profileAccounts.flatMap((a) => a.profiles);
+      const profileCount = freeProfiles.length;
+      const minDaysProfile =
+        profileAccounts.length > 0
+          ? Math.min(...profileAccounts.map((a) => a.daysRemaining))
+          : 0;
 
       if (fullCount > 0) {
         entries.push({
-          text: `${s.name} (Cuenta completa) - $${s.price} (${fullCount} disp.)`,
+          text: `${s.name} (Cuenta completa) - $${s.price} (${fullCount} disp.) [${minDaysFull}d]`,
           callback_data: `buy_${s.id}_full`,
         });
       }
       if (profileCount > 0) {
         entries.push({
-          text: `${s.name} (Perfil) - $${s.price} (${profileCount} disp.)`,
+          text: `${s.name} (Perfil) - $${s.price} (${profileCount} disp.) [${minDaysProfile}d]`,
           callback_data: `buy_${s.id}_profile`,
         });
       }
@@ -37,7 +51,9 @@ export function registerServiciosHandler(bot: Telegraf, prisma: PrismaService) {
 
     if (entries.length === 0) return ctx.reply('No hay servicios disponibles.');
 
-    const keyboard = entries.map((e) => [{ text: e.text, callback_data: e.callback_data }]);
+    const keyboard = entries.map((e) => [
+      { text: e.text, callback_data: e.callback_data },
+    ]);
 
     ctx.reply('Selecciona un servicio:', {
       reply_markup: { inline_keyboard: keyboard },

@@ -22,21 +22,21 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="bg-gray-900 border-b border-gray-800 px-6 py-4 flex items-center justify-between">
+    <nav className="bg-white border-b border-pink-200 px-6 py-4 flex items-center justify-between shadow-sm">
       <div className="flex items-center gap-6">
-        <span className="text-lg font-bold text-blue-400">StreamingBot</span>
+        <span className="text-lg font-bold text-pink-500">StreamingBot</span>
         {links.map((link) => (
           <Link
             key={link.href}
             href={link.href}
-            className={`text-sm transition ${pathname === link.href ? 'text-white' : 'text-gray-500 hover:text-gray-300'}`}
+            className={`text-sm transition ${pathname === link.href ? 'text-pink-600 font-semibold' : 'text-gray-400 hover:text-pink-400'}`}
           >
             {link.label}
           </Link>
         ))}
       </div>
-      <button onClick={handleLogout} className="text-sm text-red-400 hover:text-red-300 transition">
-        Cerrar sesión
+      <button onClick={handleLogout} className="text-sm text-rose-400 hover:text-rose-500 transition">
+        Cerrar sesion
       </button>
     </nav>
   );
