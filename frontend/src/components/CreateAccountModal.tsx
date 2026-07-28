@@ -17,6 +17,13 @@ export default function CreateAccountModal({ onClose, onSuccess }: Props) {
   const [type, setType] = useState('profile');
   const [profiles, setProfiles] = useState('5');
   const [profilePins, setProfilePins] = useState<string[]>(['', '', '', '', '']);
+
+  const updateProfilePins = (newCount: number) => {
+    setProfilePins((prev) => {
+      if (newCount > prev.length) return [...prev, ...Array(newCount - prev.length).fill('')];
+      return prev.slice(0, newCount);
+    });
+  };
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -112,11 +119,13 @@ export default function CreateAccountModal({ onClose, onSuccess }: Props) {
               <input
                 type="number"
                 value={profiles}
-                onChange={(e) => setProfiles(e.target.value)}
+                onChange={(e) => {
+                  setProfiles(e.target.value);
+                  updateProfilePins(Number(e.target.value) || 0);
+                }}
                 className="w-full bg-pink-50 border border-pink-200 rounded-lg px-4 py-3 mb-4 focus:outline-none focus:border-pink-400"
-                placeholder="Numero de perfiles (1-5)"
+                placeholder="Numero de perfiles"
                 min="1"
-                max="5"
               />
 
               {Array.from({ length: numProfiles }, (_, i) => (

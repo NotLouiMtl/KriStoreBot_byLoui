@@ -23,7 +23,7 @@ function buildDeliveryMessage(opts: {
 
   const lines = [
     '🌸🍡 MOCHI SHOP 🍡🌸',
-    `💜✨ (${typeLabel}) ✨💜`,
+    `💜✨ (${serviceName} - ${typeLabel}) ✨💜`,
     '',
     `📧 Correo: ${email}`,
     `🔐 Contraseña: ${password}`,
