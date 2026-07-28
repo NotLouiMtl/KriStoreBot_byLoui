@@ -36,7 +36,7 @@ export class BotService implements OnModuleInit {
       this.prisma,
     );
 
-    const webhookUrl = process.env.WEBHOOK_URL || 'https://kristorebot-byloui.onrender.com/bot';
+    const webhookUrl = process.env.WEBHOOK_URL || 'https://botloui.onrender.com/bot';
     this.bot.telegram
       .setWebhook(webhookUrl)
       .catch((err) => {

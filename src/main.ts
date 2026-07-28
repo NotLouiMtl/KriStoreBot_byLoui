@@ -33,6 +33,6 @@ async function bootstrap() {
 
   app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }));
   await app.listen(3000);
-  console.log('Server running on http://localhost:3000');
+  console.log('LOUIBOT - Server running on http://localhost:3000');
 }
 bootstrap();
