@@ -36,15 +36,19 @@ export class BotService implements OnModuleInit {
       this.prisma,
     );
 
-    const webhookUrl = process.env.WEBHOOK_URL || 'https://botloui.onrender.com/bot';
-    this.bot.telegram
-      .setWebhook(webhookUrl)
-      .catch((err) => {
-        this.logger.warn(
-          `Webhook registration failed (non-fatal): ${err.message}`,
-        );
-      });
-    this.logger.log('Bot webhook configurado');
+    const webhookUrl = process.env.WEBHOOK_URL;
+    if (webhookUrl) {
+      this.bot.telegram
+        .setWebhook(webhookUrl)
+        .catch((err) => {
+          this.logger.warn(
+            `Webhook registration failed (non-fatal): ${err.message}`,
+          );
+        });
+      this.logger.log('Bot webhook configurado');
+    } else {
+      this.logger.warn('WEBHOOK_URL no configurado, webhook no registrado');
+    }
   }
 
   getWebhookMiddleware() {

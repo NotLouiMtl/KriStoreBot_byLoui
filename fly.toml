@@ -1,4 +1,4 @@
-app = "botloui"
+app = "kristorebot"
 primary_region = "iad"
 
 [[services]]
