@@ -95,30 +95,33 @@ export function registerCallbackHandler(
           preferredType,
         );
 
-        if (result.type === 'full' && result.account) {
-          const a = result.account;
-          await ctx.editMessageText(
-            formatFullPurchaseMessage({
-              serviceName: result.serviceName,
-              email: a.email,
-              password: a.password,
-              pin: a.pin,
-              daysRemaining: a.daysRemaining,
-            }),
-          );
-        } else if (result.profile) {
-          const profile = result.profile;
-          await ctx.editMessageText(
-            formatProfilePurchaseMessage({
-              serviceName: result.serviceName,
-              email: profile.account.email,
-              password: profile.account.password,
-              pin: profile.pin,
-              accountPin: profile.account.pin,
-              profileNumber: profile.profileNumber,
-              daysRemaining: profile.account.daysRemaining,
-            }),
-          );
+        const msg =
+          result.type === 'full' && result.account
+            ? formatFullPurchaseMessage({
+                serviceName: result.serviceName,
+                email: result.account.email,
+                password: result.account.password,
+                pin: result.account.pin,
+                daysRemaining: result.account.daysRemaining,
+              })
+            : result.profile
+              ? formatProfilePurchaseMessage({
+                  serviceName: result.serviceName,
+                  email: result.profile.account.email,
+                  password: result.profile.account.password,
+                  pin: result.profile.pin,
+                  accountPin: result.profile.account.pin,
+                  profileNumber: result.profile.profileNumber,
+                  daysRemaining: result.profile.account.daysRemaining,
+                })
+              : '';
+
+        if (msg) {
+          try {
+            await ctx.editMessageText(msg);
+          } catch {
+            await ctx.reply(msg);
+          }
         }
       } catch (error: any) {
         ctx.reply(error.message || 'Error al procesar la compra.');
