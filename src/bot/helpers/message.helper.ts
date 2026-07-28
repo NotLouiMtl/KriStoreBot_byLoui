@@ -16,36 +16,28 @@ function buildDeliveryMessage(opts: {
 }): string {
   const { serviceName, type, email, password, pin, profileNumber, daysRemaining } = opts;
 
-  const typeLabel = type === 'full' ? 'Cuenta completa' : 'Perfil';
+  const typeLabel = type === 'full' ? 'Completa' : 'Perfil';
   const today = new Date();
   const expiry = new Date(today);
   expiry.setDate(expiry.getDate() + daysRemaining);
 
   const lines = [
-    '🌸🍡 MOCHI SHOP 🍡🌸',
-    `💜✨ (${typeLabel}) ✨💜`,
+    '🔱 STREAMING CENTRAL 🔱',
     '',
-    `📧 Correo: ${email}`,
-    `🔐 Contraseña: ${password}`,
+    `⚜️ ${serviceName} ${typeLabel} ⚜️`,
+    '',
+    `✉️: ${email}`,
+    `🔑: ${password}`,
   ];
 
-  if (pin) {
-    lines.push(`🔐 PIN: ${pin}`);
-  }
-
   if (type === 'profile' && profileNumber) {
-    lines.push(`👤 Perfil #${profileNumber}`);
+    lines.push(`👤: Perfil #${profileNumber}`);
   }
 
   lines.push('');
-  lines.push(`📅 Entrega:`);
-  lines.push(`🌸 ${formatDate(today)}`);
-  lines.push('');
-  lines.push(`⏳ Expira:`);
-  lines.push(`💖 ${formatDate(expiry)}`);
-  lines.push('');
-  lines.push('🩷 ¡Gracias por tu compra!');
-  lines.push('🍓 Cualquier duda, estamos para ayudarte. ✨');
+  lines.push(`🔐: ${pin || 'N/A'}`);
+  lines.push(`📅 Fecha de entrega: ${formatDate(today)}`);
+  lines.push(`📅 Fecha de expiración: ${formatDate(expiry)}`);
 
   return lines.join('\n');
 }
