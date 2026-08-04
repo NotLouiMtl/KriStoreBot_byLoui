@@ -33,6 +33,12 @@ export class AdminController {
     return this.adminService.getUsers();
   }
 
+  @Get('devices')
+  @UseGuards(JwtAuthGuard)
+  async getDevices() {
+    return this.adminService.getDevices();
+  }
+
   @Post('add-balance')
   @UseGuards(JwtAuthGuard)
   async addBalance(@Body() body: AddBalanceDto) {

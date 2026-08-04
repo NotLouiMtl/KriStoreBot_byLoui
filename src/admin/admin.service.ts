@@ -14,6 +14,15 @@ export class AdminService {
     return this.prisma.user.findMany({ orderBy: { createdAt: 'desc' } });
   }
 
+  async getDevices() {
+    return this.prisma.device.findMany({
+      orderBy: { createdAt: 'desc' },
+      include: {
+        user: { select: { id: true, username: true, telegramId: true, role: true } },
+      },
+    });
+  }
+
   async addBalance(telegramId: string, amount: number) {
     return this.prisma.$transaction(async (tx) => {
       const user = await tx.user.findUnique({
